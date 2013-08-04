@@ -1,7 +1,6 @@
 class config (
 	$install_path,
-	$default_vhost
-	) {
+	$default_vhost ) {
 
 	file_line { "profile":
 		path => '/etc/profile',

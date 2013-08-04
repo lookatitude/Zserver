@@ -2,7 +2,7 @@
 #
 # This module manages zendserver
 #
-# Parameters: version
+# Parameters: 0.1.0-dev
 #
 # Actions:
 #
@@ -16,71 +16,74 @@ class zserver (
   $nginx          = '',
   $ce             = '',
   $install_path   = '',
-  $default_vhost  = '',
-
-){
-  include zendserver::params
-  
-  if $version == '' {
-    $version = $zendserver::params::version
-  }
-  
-  if $php_version == '' {
-    $php_version = $zendserver::params::php_version  
-  }
-  
-  if $nginx == '' {
-    $nginx = $zendserver::params::nginx
+  $default_vhost  = '' ){
+  include zserver::params
     
+    $int_version = $version ? {
+      '' => $zserver::params::version,
+      default => $version
     }
-  if $ce == '' {
-    $ce = $zendserver::params::ce
-  
-  }
-  if $install_path == '' {
-    $install_path = $zendserver::params::install_path
     
-  }
-  if $default_vhost == '' {
-    $default_vhost  = $zendserver::params::default_vhost
-  }
+    $int_php_version = $php_version ? {
+      '' => $zserver::params::php_version,
+      default => $php_version 
+    }
+    
+    $int_nginx = $nginx ? {
+      '' => $zserver::params::nginx,
+      default => $nginx
+      
+      }
+    $int_community_edition = $ce ? {
+      '' => $zserver::params::ce, 
+      default => $ce
+    }
+    $int_install_path = $install_path ? {
+      '' => $zserver::params::install_path, 
+      default => $install_path
+    }
+    $int_default_vhost = $default_vhost ? {
+        '' => $zserver::params::default_vhost,
+        default => $default_vhost
+    }
+    
+    notify {"variables":
+      message => "Version: ${int_version} \n php_version: ${int_php_version} \n nginx: ${int_nginx} \n ce: ${int_community_edition}  \n install_path: ${int_install_path}  \n default_vhost: ${int_default_vhost}  \n ",
+    }
+     
   
-  notify {"variables":
-    message => "Version: ${version} \n  php_version: $php_version \n nginx: $nginx \n ce: $ce  \n install_path: $install_path  \n default_vhost: $default_vhost  \n ",
-  }
-
-  #########################
-  # set repositories
-  #########################
-
-  zendserver::repo { 'repo':
-    version   => $version,
-    # subscribe => Notify['variables'],
-  }
-
-  ############################
-  # set Package and install
-  ############################
-
-  zendserver::package { 'package':
-    version     => $version,
-    php_version => $php_version,
-    nginx       => $nginx,
-    ce          => $ce,
-    # subscribe   => Zendserver::Repo['repo'],
-  }
-
-  # #########################
-  #  Set configuration
-  ###########################
-
-  class { 'config':
-    install_path  => $install_path,
-    default_vhost => $default_vhost,
-    # subscribe     => Zendserver::Package['package'],
-  }
-
-  Notify['variables']->Zendserver::Repo['repo']->Zendserver::Package['package']->Class['config']
+    #########################
+    # set repositories
+    #########################
+  
+    zserver::repo { 'repo':
+      version   => $int_version,
+      # subscribe => Notify['variables'],
+    }
+  
+    ############################
+    # set Package and install
+    ############################
+  
+    zserver::package { 'package':
+      version     => $int_version,
+      php_version => $int_php_version,
+      nginx       => $int_nginx,
+      ce          => $int_community_edition,
+      # subscribe   => Zendserver::Repo['repo'],
+    }
+  
+    # #########################
+    #  Set configuration
+    ###########################
+  
+    class { 'config':
+      install_path  => $int_install_path,
+      default_vhost => $int_default_vhost,
+      # subscribe     => Zendserver::Package['package'],
+    }
+  
+    Notify['variables']->Zserver::Repo['repo']->Zserver::Package['package']->Class['config']
   # restart zend-server service
   # zendserver::service 
 }

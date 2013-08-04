@@ -1,4 +1,4 @@
-class zendserver::params {
+class zserver::params {
 
   # PHP version to be used
   $php_version = "5.4"

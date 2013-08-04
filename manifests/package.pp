@@ -1,9 +1,8 @@
-define zendserver::package (
+define zserver::package (
 	$version ,
 	$php_version,
  	$nginx,
- 	$ce,
-	){
+ 	$ce ){
 
 	case $nginx {
 		true: {

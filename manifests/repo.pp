@@ -1,6 +1,5 @@
-define zendserver::repo (
-  $version = 'UNSET',
-  ) {
+define zserver::repo (
+  $version = 'UNSET') {
   
   # notify {"Version in repo: ${version}":}
   
