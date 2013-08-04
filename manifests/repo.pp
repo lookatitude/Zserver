@@ -19,15 +19,15 @@ define zserver::repo (
     key_server  => 'http://repos.zend.com/zend.key',
   }
 
-  # add ssl repo and key
-  apt::source { 'zendserverrepossl':
-    include_src => false,
-    location    => $repo_ssl,
-    release     => 'server',
-    repos       => 'non-free',
-    key         => 'F7D2C623',
-    key_server  => 'http://repos.zend.com/zend.key',
-  }
-#  exec { "apt-get update": }
+#  # add ssl repo and key
+#  # @TODO: fix, breaks on debian (dependency cycle)
+#  apt::source { 'zendserverrepossl':
+#    include_src => false,
+#    location    => $repo_ssl,
+#    release     => 'server',
+#    repos       => 'non-free',
+#    key         => 'F7D2C623',
+#    key_server  => 'http://repos.zend.com/zend.key',
+#  }
 
 }
