@@ -13,6 +13,7 @@ class config (
     '' => '',
     default => "--orderNumber ${orderNumber} --licenseKey ${licenseKey} "
   }
+  $command = "/usr/local/zend/bin/zs-manage bootstrap-single-server --adminPassword ${adminPassword} --devPassword ${devPassword} ${order}--acceptEula ${acceptEula} --appUrl ${appUrl} --production ${production}"
   
 	file_line { "profile":
 		path => '/etc/profile',
@@ -25,12 +26,34 @@ class config (
 		#match => "root *$",
 		line => "root /usr/share/nginx/html;",
     ensure => absent,
+    notify => Service['zend-server'],
 	}
+	service {"zend-server":
+    ensure => "running",
+  }
 	
 	exec { "zserverconfig":
-    command => "/usr/local/zend/bin/zs-manage bootstrap-single-server --adminPassword ${adminPassword} --devPassword ${devPassword} ${order}--acceptEula ${acceptEula} --appUrl ${appUrl} --production ${production}",
+    command => $command,
   }
   
-	File_Line['profile']->File_Line['defaultvhost']->Exec['zserverconfig']
-
+	File_Line['profile']->File_Line['defaultvhost']->Service['zend-server']->Exec['zserverconfig']
+  
+#  case $orderNumber {
+#    '': {
+#      $command = "/usr/local/zend/bin/zs-manage bootstrap-single-server --adminPassword ${adminPassword} --devPassword ${devPassword}--acceptEula ${acceptEula} --appUrl ${appUrl} --production ${production}"
+#      exec { "zserverconfig":
+#        command => $command,
+#      }
+#    }
+#    default: {
+#      $order = "--orderNumber ${orderNumber} --licenseKey ${licenseKey} "
+#      
+#      $command = "/usr/local/zend/bin/zs-manage bootstrap-single-server --adminPassword ${adminPassword} --devPassword ${devPassword} ${order}--acceptEula ${acceptEula} --appUrl ${appUrl} --production ${production}"
+#      
+#      exec { "zserverconfig":
+#        command => $command,
+#      }
+#    }
+#  }
+  
 }
