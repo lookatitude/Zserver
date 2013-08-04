@@ -16,7 +16,14 @@ class zserver (
   $nginx          = '',
   $ce             = '',
   $install_path   = '',
-  $default_vhost  = '' ){
+  $default_vhost  = '',
+  $admin_password = '',
+  $devPassword    = '',
+  $orderNumber    = '',
+  $licenseKey     = '',
+  $acceptEula     = "",
+  $appUrl         = '',
+  $production     = "" ){
   include zserver::params
     
     $int_version = $version ? {
@@ -46,10 +53,40 @@ class zserver (
         '' => $zserver::params::default_vhost,
         default => $default_vhost
     }
-    
-    notify {"variables":
-      message => "Version: ${int_version} \n php_version: ${int_php_version} \n nginx: ${int_nginx} \n ce: ${int_community_edition}  \n install_path: ${int_install_path}  \n default_vhost: ${int_default_vhost}  \n ",
+    $int_admin_password = $admin_password ? {
+        '' => $zserver::params::admin_password,
+        default => $admin_password
     }
+    
+    $int_devPassword = $devPassword ? {
+        '' => $zserver::params::devPassword,
+        default => $devPassword
+    }
+    
+    $int_orderNumber = $orderNumber ? {
+        '' => $zserver::params::orderNumber,
+        default => $orderNumber
+    }
+    $int_licenseKey = $licenseKey ? {
+        '' => $zserver::params::licenseKey,
+        default => $licenseKey
+    }
+    $int_acceptEula = $acceptEula ? {
+        '' => $zserver::params::acceptEula,
+        default => $acceptEula
+    }
+    $int_appUrl = $appUrl ? {
+        '' => $zserver::params::appUrl,
+        default => $appUrl 
+    }
+    $int_production = $production ? {
+        '' => $zserver::params::production,
+        default => $production
+    }
+    
+#    notify {"variables":
+#      message => "Version: ${int_version} \n php_version: ${int_php_version} \n nginx: ${int_nginx} \n ce: ${int_community_edition}  \n install_path: ${int_install_path}  \n default_vhost: ${int_default_vhost}  \n ",
+#    }
      
   
     #########################
@@ -80,10 +117,17 @@ class zserver (
     class { 'config':
       install_path  => $int_install_path,
       default_vhost => $int_default_vhost,
+      adminPassword => $int_admin_password,
+		  devPassword    => $int_devPassword,
+		  orderNumber    => $int_orderNumber,
+		  licenseKey     => $int_licenseKey,
+		  acceptEula     => $int_acceptEula,
+		  appUrl         => $int_appUrl,
+		  production     => $int_production, 
       # subscribe     => Zendserver::Package['package'],
     }
   
-    Notify['variables']->Zserver::Repo['repo']->Zserver::Package['package']->Class['config']
+    Zserver::Repo['repo']->Zserver::Package['package']->Class['config']
   # restart zend-server service
   # zendserver::service 
 }
